@@ -1,44 +1,24 @@
-package com.priyankaa.enterprise_order_management_system.entity;
+package com.priyankaa.enterprise_order_management_system.dto;
 
 import com.priyankaa.enterprise_order_management_system.enums.Role;
-import jakarta.persistence.*;
 
-@Entity
-@Table(name = "users")
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class UserRequest {
 
     private String name;
-
     private String email;
-
     private String password;
-
     private String phone;
-
-    @Enumerated(EnumType.STRING)
     private Role role;
 
-    public User() {
+    public UserRequest() {
     }
 
-    public User(String name, String email, String password, String phone, Role role) {
+    public UserRequest(String name, String email, String password, String phone, Role role) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.phone = phone;
         this.role = role;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
