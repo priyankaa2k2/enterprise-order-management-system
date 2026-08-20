@@ -4,6 +4,7 @@ import com.priyankaa.enterprise_order_management_system.enums.Role;
 
 public class UserRequest {
 
+    private String address;
     private String name;
     private String email;
     private String password;
@@ -13,12 +14,21 @@ public class UserRequest {
     public UserRequest() {
     }
 
-    public UserRequest(String name, String email, String password, String phone, Role role) {
+    public UserRequest(String address, String name, String email, String password, String phone, Role role) {
+        this.address = address;
         this.name = name;
         this.email = email;
         this.password = password;
         this.phone = phone;
         this.role = role;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getName() {

@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.priyankaa.enterprise_order_management_system.dto.UserRequest;
 import com.priyankaa.enterprise_order_management_system.dto.UserResponse;
 
+import com.priyankaa.enterprise_order_management_system.dto.LoginRequest;
+import com.priyankaa.enterprise_order_management_system.dto.LoginResponse;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -32,4 +35,10 @@ public class UserController {
     public UserResponse registerUser(@RequestBody UserRequest request) {
         return userService.registerUser(request);
     }
+
+    @PostMapping("/login")
+    public LoginResponse login(@RequestBody LoginRequest request) {
+        return userService.login(request);
+    }
 }
+

@@ -5,6 +5,7 @@ import com.priyankaa.enterprise_order_management_system.enums.Role;
 public class UserResponse {
 
     private Long id;
+    private String address;
     private String name;
     private String email;
     private String phone;
@@ -13,8 +14,9 @@ public class UserResponse {
     public UserResponse() {
     }
 
-    public UserResponse(Long id, String name, String email, String phone, Role role) {
+    public UserResponse(Long id, String address, String name, String email, String phone, Role role) {
         this.id = id;
+        this.address = address;
         this.name = name;
         this.email = email;
         this.phone = phone;
@@ -27,6 +29,14 @@ public class UserResponse {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getName() {
