@@ -12,16 +12,21 @@ import com.priyankaa.enterprise_order_management_system.dto.LoginRequest;
 import com.priyankaa.enterprise_order_management_system.dto.LoginResponse;
 import com.priyankaa.enterprise_order_management_system.entity.User;
 
+import com.priyankaa.enterprise_order_management_system.security.JwtService;
+
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public UserService(UserRepository userRepository,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder,
+                       JwtService jwtService, JwtService jwtService1) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public UserResponse registerUser(UserRequest request) {
@@ -64,10 +69,16 @@ public class UserService {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
+        String token = jwtService.generateToken(
+                user.getEmail(),
+                user.getRole().name()
+        );
+
         return new LoginResponse(
                 "Login successful",
                 user.getEmail(),
-                user.getRole().name()
+                user.getRole().name(),
+                token
         );
     }
 }
