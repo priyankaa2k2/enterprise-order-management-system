@@ -32,10 +32,9 @@ public class SecurityConfig {
                                 "/api/users/register",
                                 "/api/users/login"
                         ).permitAll()
-                        // Role-Based Authorization for Products
-                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/products/**").hasAnyRole("ADMIN", "MANAGER")
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products/**").hasAnyRole("CUSTOMER", "ADMIN", "MANAGER")
-
+                        // Synchronized Role-Based Authorization for Products
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products/**").hasAnyRole("CUSTOMER", "ADMIN")
                         .anyRequest().authenticated()
 
                 )
