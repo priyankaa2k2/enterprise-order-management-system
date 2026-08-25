@@ -32,6 +32,10 @@ public class SecurityConfig {
                                 "/api/users/register",
                                 "/api/users/login"
                         ).permitAll()
+                        // Role-Based Authorization for Products
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/products/**").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products/**").hasAnyRole("CUSTOMER", "ADMIN", "MANAGER")
+
                         .anyRequest().authenticated()
 
                 )
