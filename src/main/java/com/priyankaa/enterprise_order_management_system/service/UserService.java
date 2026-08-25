@@ -1,18 +1,15 @@
 package com.priyankaa.enterprise_order_management_system.service;
 
+import com.priyankaa.enterprise_order_management_system.dto.LoginRequest;
+import com.priyankaa.enterprise_order_management_system.dto.LoginResponse;
 import com.priyankaa.enterprise_order_management_system.dto.UserRequest;
 import com.priyankaa.enterprise_order_management_system.dto.UserResponse;
 import com.priyankaa.enterprise_order_management_system.entity.User;
 import com.priyankaa.enterprise_order_management_system.exception.InvalidCredentialsException;
 import com.priyankaa.enterprise_order_management_system.repository.UserRepository;
+import com.priyankaa.enterprise_order_management_system.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.priyankaa.enterprise_order_management_system.dto.LoginRequest;
-import com.priyankaa.enterprise_order_management_system.dto.LoginResponse;
-import com.priyankaa.enterprise_order_management_system.entity.User;
-
-import com.priyankaa.enterprise_order_management_system.security.JwtService;
 
 @Service
 public class UserService {
@@ -23,7 +20,7 @@ public class UserService {
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       JwtService jwtService, JwtService jwtService1) {
+                       JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
@@ -79,6 +76,22 @@ public class UserService {
                 user.getEmail(),
                 user.getRole().name(),
                 token
+        );
+    }
+
+    public UserResponse getProfile(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new InvalidCredentialsException("User not found"));
+
+        return new UserResponse(
+                user.getId(),
+                user.getAddress(),
+                user.getName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getRole()
         );
     }
 }
