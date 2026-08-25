@@ -1,6 +1,6 @@
 # Enterprise Order Management System (OMS)
 
-A secure, performance-optimized Java backend REST API engine engineered for high-throughput product cataloging, transactional shopping checkouts, and dynamic multi-tiered access control rules.
+A Java/Spring Boot backend application for managing users, products, inventory, and customer orders, with authentication, authorization, transactional business logic, and database persistence
 
 ## 🚀 Technology Stack
 * **Runtime / Engine:** Java 17, Spring Boot 4.0.7
@@ -11,6 +11,27 @@ A secure, performance-optimized Java backend REST API engine engineered for high
 ## 🛠️ System Architecture & Code Flow
 The system processes data linearly using industry-standard decoupled architecture design:
 `Client Request` ➔ `Security/JWT Filter` ➔ `REST Controller` ➔ `Service Layer (Business Logic)` ➔ `Data Access Layer (JPA Repository)` ➔ `MySQL Database`
+
+Supporting components include:
+
+* DTOs for API request/response models
+* Entity classes for persistence
+* Security configuration and JWT authentication
+* Global exception handling
+* Validation
+* Transaction management
+
+## 🔐 Security
+
+The application uses **Spring Security and JWT** for authentication and authorization.
+
+Key security concepts implemented:
+
+* User authentication
+* Password protection
+* JWT generation and validation
+* Role-based access control
+* Protected API endpoints
 
 ## 🔒 Security Matrix & Endpoints
 
@@ -23,7 +44,94 @@ The system processes data linearly using industry-standard decoupled architectur
 | **POST** | `/api/orders` | `CUSTOMER` Only | Executes standard transactional checkout & stock deduction |
 | **GET** | `/api/orders` | `CUSTOMER` Only | Pulls historical user-authenticated purchase context |
 
+## 📦 Order Processing
 
-## ⚙️ Core Technical Highlights
-* **Atomic Transactions:** Checkout sequence leverages `@Transactional` layers, ensuring matching integrity between total invoice sums and warehouse inventory deductions. If any single validation step or inventory ceiling boundary checks fail, the entire execution cascades back to zero.
-* **Price Isolation:** Stores product price snapshots directly inside order line rows (`order_items`) at the instant of calculation to guard historical fiscal analytics against future admin inventory updates.
+Order processing demonstrates transactional business logic.
+
+The order workflow includes:
+
+1. Validate the request
+2. Verify product availability
+3. Check inventory
+4. Create the order
+5. Deduct inventory
+6. Persist the transaction
+
+Transactional boundaries help ensure that related database operations are completed consistently.
+
+## 🗄️ Database
+
+The application uses **MySQL** with JPA/Hibernate for persistence.
+
+Main domain areas include:
+
+* Users
+* Roles
+* Products
+* Inventory
+* Orders
+* Order items
+
+Entity relationships are managed using JPA/Hibernate mappings.
+
+## 📚 API Documentation
+
+API endpoints are documented using **Swagger / OpenAPI**.
+
+After starting the application, the API documentation can be accessed through the configured Swagger UI endpoint.
+
+## ▶️ Running Locally
+
+### Prerequisites
+
+* Java 17
+* Maven
+* MySQL
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/priyankaa2k2/enterprise-order-management-system.git
+cd enterprise-order-management-system
+```
+
+### 2. Configure the database
+
+Create a MySQL database and configure the required connection properties in the application configuration.
+
+### 3. Build the application
+
+```bash
+./mvnw clean install
+```
+
+### 4. Run the application
+
+```bash
+./mvnw spring-boot:run
+```
+
+The application will start using the configured Spring Boot port.
+
+## 🧪 Testing
+
+The REST APIs are currently being tested using Postman.
+
+A dedicated Postman workspace is maintained with saved requests covering authentication, product management, and order workflows.
+
+## 📚 Project Purpose
+
+This project was built to demonstrate practical backend development using the **Java and Spring Boot ecosystem**, including REST API development, security, persistence, database design, validation, and transactional business logic.
+
+## 📌 Project Status
+
+The core backend functionality is implemented and currently being validated through API testing.
+
+Future improvements may include:
+
+* Unit and integration testing with JUnit/Mockito
+* Docker-based application setup
+* Additional API functionality
+* Expanded automated test coverage
+
+These will be added to the project as they are implemented and validated.
