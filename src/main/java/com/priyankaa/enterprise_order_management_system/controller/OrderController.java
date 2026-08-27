@@ -38,4 +38,14 @@ public class OrderController {
         List<OrderResponse> response = orderService.getOrderHistory(email);
         return ResponseEntity.ok(response);
     }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<OrderResponse> updateOrderStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody com.priyankaa.enterprise_order_management_system.dto.StatusUpdateRequest request) {
+        System.out.println(">>> Order status update controller reached");
+        OrderResponse response = orderService.updateOrderStatus(id, request.getStatus());
+        return ResponseEntity.ok(response);
+    }
+
 }

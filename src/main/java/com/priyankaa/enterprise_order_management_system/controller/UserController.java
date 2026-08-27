@@ -34,7 +34,7 @@ public class UserController {
         return "User Registration API is Working!";
     }
 
-    @PostMapping
+    @PostMapping("/register")
     public UserResponse registerUser(@RequestBody UserRequest request) {
         return userService.registerUser(request);
     }

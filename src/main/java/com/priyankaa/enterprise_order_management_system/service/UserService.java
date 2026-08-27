@@ -33,6 +33,7 @@ public class UserService {
 
         user.setName(request.getName());
         user.setEmail(request.getEmail());
+        user.setAddress(request.getAddress());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhone(request.getPhone());
         user.setRole(request.getRole());
@@ -48,7 +49,7 @@ public class UserService {
         response.setEmail(savedUser.getEmail());
         response.setPhone(savedUser.getPhone());
         response.setRole(savedUser.getRole());
-
+        response.setAddress(savedUser.getAddress());
         return response;
     }
 

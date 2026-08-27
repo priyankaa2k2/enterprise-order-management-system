@@ -3,6 +3,7 @@ package com.priyankaa.enterprise_order_management_system.service;
 import com.priyankaa.enterprise_order_management_system.dto.*;
 import com.priyankaa.enterprise_order_management_system.entity.*;
 import com.priyankaa.enterprise_order_management_system.enums.OrderStatus;
+import com.priyankaa.enterprise_order_management_system.exception.ResourceNotFoundException;
 import com.priyankaa.enterprise_order_management_system.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -93,4 +94,15 @@ public class OrderService {
         response.setItems(itemResponses);
         return response;
     }
+
+    public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
+
+
+        order.setStatus(newStatus);
+        Order updatedOrder = orderRepository.save(order);
+        return mapToResponse(updatedOrder);
+    }
+
 }
