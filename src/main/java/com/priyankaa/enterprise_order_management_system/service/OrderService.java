@@ -3,6 +3,7 @@ package com.priyankaa.enterprise_order_management_system.service;
 import com.priyankaa.enterprise_order_management_system.dto.*;
 import com.priyankaa.enterprise_order_management_system.entity.*;
 import com.priyankaa.enterprise_order_management_system.enums.OrderStatus;
+import com.priyankaa.enterprise_order_management_system.exception.InsufficientStockException;
 import com.priyankaa.enterprise_order_management_system.exception.ResourceNotFoundException;
 import com.priyankaa.enterprise_order_management_system.repository.*;
 import org.springframework.stereotype.Service;
@@ -40,10 +41,14 @@ public class OrderService {
 
         for (OrderItemRequest itemReq : request.getItems()) {
             Product product = productRepository.findById(itemReq.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found with ID: " + itemReq.getProductId()));
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException(
+                                    "Product not found with ID: " + itemReq.getProductId()));
 
             if (product.getStockQuantity() < itemReq.getQuantity()) {
-                throw new RuntimeException("Insufficient stock for product: " + product.getName());
+                throw new InsufficientStockException(
+                        "Insufficient stock for product: " + product.getName()
+                );
             }
 
             // Deduct inventory stock
@@ -67,7 +72,9 @@ public class OrderService {
 
     public List<OrderResponse> getOrderHistory(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found with email: " + userEmail));
 
         return orderRepository.findByUserId(user.getId()).stream()
                 .map(this::mapToResponse)
