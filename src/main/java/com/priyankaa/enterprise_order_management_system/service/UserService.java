@@ -5,6 +5,7 @@ import com.priyankaa.enterprise_order_management_system.dto.LoginResponse;
 import com.priyankaa.enterprise_order_management_system.dto.UserRequest;
 import com.priyankaa.enterprise_order_management_system.dto.UserResponse;
 import com.priyankaa.enterprise_order_management_system.entity.User;
+import com.priyankaa.enterprise_order_management_system.exception.DuplicateResourceException;
 import com.priyankaa.enterprise_order_management_system.exception.InvalidCredentialsException;
 import com.priyankaa.enterprise_order_management_system.repository.UserRepository;
 import com.priyankaa.enterprise_order_management_system.security.JwtService;
@@ -31,6 +32,11 @@ public class UserService {
         // Convert UserRequest DTO to User Entity
         User user = new User();
 
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new DuplicateResourceException(
+                    "User already exists with email: " + request.getEmail()
+            );
+        }
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setAddress(request.getAddress());
