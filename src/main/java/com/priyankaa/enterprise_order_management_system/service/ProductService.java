@@ -3,6 +3,7 @@ package com.priyankaa.enterprise_order_management_system.service;
 import com.priyankaa.enterprise_order_management_system.dto.ProductRequest;
 import com.priyankaa.enterprise_order_management_system.dto.ProductResponse;
 import com.priyankaa.enterprise_order_management_system.entity.Product;
+import com.priyankaa.enterprise_order_management_system.exception.DuplicateResourceException;
 import com.priyankaa.enterprise_order_management_system.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,9 @@ public class ProductService {
 
     public ProductResponse createProduct(ProductRequest request) {
         if (productRepository.existsBySku(request.getSku())) {
-            throw new RuntimeException("Product with SKU " + request.getSku() + " already exists.");
+            throw new DuplicateResourceException(
+                    "Product already exists with SKU: " + request.getSku()
+            );
         }
 
         Product product = new Product(
