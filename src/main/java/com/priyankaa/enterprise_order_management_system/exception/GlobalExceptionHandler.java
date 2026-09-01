@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import tools.jackson.databind.exc.InvalidFormatException;
+import com.priyankaa.enterprise_order_management_system.exception.InvalidOrderStatusTransitionException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -139,6 +140,21 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
+                .body(body);
+    }
+
+    @ExceptionHandler(InvalidOrderStatusTransitionException.class)
+    public ResponseEntity<Object> handleInvalidOrderStatusTransition(
+            InvalidOrderStatusTransitionException ex) {
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "Bad Request");
+        body.put("message", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(body);
     }
 }

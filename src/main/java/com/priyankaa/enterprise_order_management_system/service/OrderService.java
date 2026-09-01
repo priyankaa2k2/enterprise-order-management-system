@@ -4,6 +4,7 @@ import com.priyankaa.enterprise_order_management_system.dto.*;
 import com.priyankaa.enterprise_order_management_system.entity.*;
 import com.priyankaa.enterprise_order_management_system.enums.OrderStatus;
 import com.priyankaa.enterprise_order_management_system.exception.InsufficientStockException;
+import com.priyankaa.enterprise_order_management_system.exception.InvalidOrderStatusTransitionException;
 import com.priyankaa.enterprise_order_management_system.exception.ResourceNotFoundException;
 import com.priyankaa.enterprise_order_management_system.repository.*;
 import org.springframework.stereotype.Service;
@@ -105,14 +106,54 @@ public class OrderService {
         return response;
     }
 
+    @Transactional
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
 
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Order not found with ID: " + orderId
+                        ));
+
+        OrderStatus currentStatus = order.getStatus();
+
+        validateStatusTransition(currentStatus, newStatus);
 
         order.setStatus(newStatus);
+
         Order updatedOrder = orderRepository.save(order);
+
         return mapToResponse(updatedOrder);
+    }
+
+    private void validateStatusTransition(
+            OrderStatus currentStatus,
+            OrderStatus newStatus) {
+
+        boolean validTransition = switch (currentStatus) {
+
+            case PENDING ->
+                    newStatus == OrderStatus.CONFIRMED
+                            || newStatus == OrderStatus.CANCELLED;
+
+            case CONFIRMED ->
+                    newStatus == OrderStatus.SHIPPED
+                            || newStatus == OrderStatus.CANCELLED;
+
+            case SHIPPED ->
+                    newStatus == OrderStatus.DELIVERED;
+
+            case DELIVERED, CANCELLED -> false;
+        };
+
+        if (!validTransition) {
+            throw new InvalidOrderStatusTransitionException(
+                    "Invalid order status transition from "
+                            + currentStatus
+                            + " to "
+                            + newStatus
+            );
+        }
     }
 
 }

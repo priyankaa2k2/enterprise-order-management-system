@@ -9,6 +9,7 @@ import com.priyankaa.enterprise_order_management_system.entity.User;
 import com.priyankaa.enterprise_order_management_system.enums.OrderStatus;
 import com.priyankaa.enterprise_order_management_system.enums.Role;
 import com.priyankaa.enterprise_order_management_system.exception.InsufficientStockException;
+import com.priyankaa.enterprise_order_management_system.exception.InvalidOrderStatusTransitionException;
 import com.priyankaa.enterprise_order_management_system.exception.ResourceNotFoundException;
 import com.priyankaa.enterprise_order_management_system.repository.OrderRepository;
 import com.priyankaa.enterprise_order_management_system.repository.ProductRepository;
@@ -346,4 +347,229 @@ class OrderServiceTest {
 
         return order;
     }
+
+    @Test
+    void updateOrderStatus_ShouldAllowPendingToCancelled() {
+
+        Order order = createSampleOrder();
+        order.setStatus(OrderStatus.PENDING);
+
+        when(orderRepository.findById(100L))
+                .thenReturn(Optional.of(order));
+
+        when(orderRepository.save(any(Order.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        OrderResponse response =
+                orderService.updateOrderStatus(
+                        100L,
+                        OrderStatus.CANCELLED
+                );
+
+        assertEquals(OrderStatus.CANCELLED, response.getStatus());
+
+        verify(orderRepository).save(order);
+    }
+
+    @Test
+    void updateOrderStatus_ShouldAllowConfirmedToShipped() {
+
+        Order order = createSampleOrder();
+        order.setStatus(OrderStatus.CONFIRMED);
+
+        when(orderRepository.findById(100L))
+                .thenReturn(Optional.of(order));
+
+        when(orderRepository.save(any(Order.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        OrderResponse response =
+                orderService.updateOrderStatus(
+                        100L,
+                        OrderStatus.SHIPPED
+                );
+
+        assertEquals(OrderStatus.SHIPPED, response.getStatus());
+
+        verify(orderRepository).save(order);
+    }
+
+    @Test
+    void updateOrderStatus_ShouldAllowConfirmedToCancelled() {
+
+        Order order = createSampleOrder();
+        order.setStatus(OrderStatus.CONFIRMED);
+
+        when(orderRepository.findById(100L))
+                .thenReturn(Optional.of(order));
+
+        when(orderRepository.save(any(Order.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        OrderResponse response =
+                orderService.updateOrderStatus(
+                        100L,
+                        OrderStatus.CANCELLED
+                );
+
+        assertEquals(OrderStatus.CANCELLED, response.getStatus());
+
+        verify(orderRepository).save(order);
+    }
+
+    @Test
+    void updateOrderStatus_ShouldAllowShippedToDelivered() {
+
+        Order order = createSampleOrder();
+        order.setStatus(OrderStatus.SHIPPED);
+
+        when(orderRepository.findById(100L))
+                .thenReturn(Optional.of(order));
+
+        when(orderRepository.save(any(Order.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        OrderResponse response =
+                orderService.updateOrderStatus(
+                        100L,
+                        OrderStatus.DELIVERED
+                );
+
+        assertEquals(OrderStatus.DELIVERED, response.getStatus());
+
+        verify(orderRepository).save(order);
+    }
+
+    @Test
+    void updateOrderStatus_ShouldRejectPendingToShipped() {
+
+        Order order = createSampleOrder();
+        order.setStatus(OrderStatus.PENDING);
+
+        when(orderRepository.findById(100L))
+                .thenReturn(Optional.of(order));
+
+        InvalidOrderStatusTransitionException exception =
+                assertThrows(
+                        InvalidOrderStatusTransitionException.class,
+                        () -> orderService.updateOrderStatus(
+                                100L,
+                                OrderStatus.SHIPPED
+                        )
+                );
+
+        assertEquals(
+                "Invalid order status transition from PENDING to SHIPPED",
+                exception.getMessage()
+        );
+
+        verify(orderRepository, never())
+                .save(any(Order.class));
+    }
+
+    @Test
+    void updateOrderStatus_ShouldRejectShippedToCancelled() {
+
+        Order order = createSampleOrder();
+        order.setStatus(OrderStatus.SHIPPED);
+
+        when(orderRepository.findById(100L))
+                .thenReturn(Optional.of(order));
+
+        InvalidOrderStatusTransitionException exception =
+                assertThrows(
+                        InvalidOrderStatusTransitionException.class,
+                        () -> orderService.updateOrderStatus(
+                                100L,
+                                OrderStatus.CANCELLED
+                        )
+                );
+
+        assertEquals(
+                "Invalid order status transition from SHIPPED to CANCELLED",
+                exception.getMessage()
+        );
+
+        verify(orderRepository, never())
+                .save(any(Order.class));
+    }
+
+    @Test
+    void updateOrderStatus_ShouldRejectDeliveredToPending() {
+
+        Order order = createSampleOrder();
+        order.setStatus(OrderStatus.DELIVERED);
+
+        when(orderRepository.findById(100L))
+                .thenReturn(Optional.of(order));
+
+        InvalidOrderStatusTransitionException exception =
+                assertThrows(
+                        InvalidOrderStatusTransitionException.class,
+                        () -> orderService.updateOrderStatus(
+                                100L,
+                                OrderStatus.PENDING
+                        )
+                );
+
+        assertEquals(
+                "Invalid order status transition from DELIVERED to PENDING",
+                exception.getMessage()
+        );
+
+        verify(orderRepository, never())
+                .save(any(Order.class));
+    }
+
+    @Test
+    void updateOrderStatus_ShouldRejectCancelledToConfirmed() {
+
+        Order order = createSampleOrder();
+        order.setStatus(OrderStatus.CANCELLED);
+
+        when(orderRepository.findById(100L))
+                .thenReturn(Optional.of(order));
+
+        InvalidOrderStatusTransitionException exception =
+                assertThrows(
+                        InvalidOrderStatusTransitionException.class,
+                        () -> orderService.updateOrderStatus(
+                                100L,
+                                OrderStatus.CONFIRMED
+                        )
+                );
+
+        assertEquals(
+                "Invalid order status transition from CANCELLED to CONFIRMED",
+                exception.getMessage()
+        );
+
+        verify(orderRepository, never())
+                .save(any(Order.class));
+    }
+
+    @Test
+    void updateOrderStatus_ShouldThrowException_WhenOrderDoesNotExist() {
+
+        when(orderRepository.findById(999L))
+                .thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception =
+                assertThrows(
+                        ResourceNotFoundException.class,
+                        () -> orderService.updateOrderStatus(
+                                999L,
+                                OrderStatus.CONFIRMED
+                        )
+                );
+
+        assertEquals(
+                "Order not found with ID: 999",
+                exception.getMessage()
+        );
+
+        verify(orderRepository, never())
+                .save(any(Order.class));
+    }
 }
+
