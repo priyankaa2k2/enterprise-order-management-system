@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.priyankaa.enterprise_order_management_system.entity.User;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -19,6 +18,8 @@ import com.priyankaa.enterprise_order_management_system.dto.LoginResponse;
 
 import org.springframework.security.core.Authentication;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -29,18 +30,12 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping
-    public String testApi() {
-        return "User Registration API is Working!";
-    }
-
     @PostMapping("/register")
-    public UserResponse registerUser(@RequestBody UserRequest request) {
-        return userService.registerUser(request);
+    public UserResponse registerUser(@Valid @RequestBody UserRequest request) {    return userService.registerUser(request);
     }
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         return userService.login(request);
     }
 

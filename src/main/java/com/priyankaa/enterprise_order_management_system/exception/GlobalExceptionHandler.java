@@ -21,12 +21,18 @@ import com.priyankaa.enterprise_order_management_system.exception.InvalidOrderSt
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<Map<String, String>> handleInvalidCredentials(
-            InvalidCredentialsException exception) {
+    public ResponseEntity<Object> handleInvalidCredentials(
+            InvalidCredentialsException ex) {
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.UNAUTHORIZED.value());
+        body.put("error", "Unauthorized");
+        body.put("message", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("message", exception.getMessage()));
+                .body(body);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)

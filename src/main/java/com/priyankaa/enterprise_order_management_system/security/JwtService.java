@@ -13,12 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 @Service
 public class JwtService {
 
-//    private static final String SECRET_KEY =
-//            "my-super-secret-key-for-enterprise-oms-project-2026";
-//
-//    private static final long EXPIRATION_TIME =
-//            1000 * 60 * 60; // 1 hour
-
     @Value("${jwt.secret}")
     private String secretKey;
 

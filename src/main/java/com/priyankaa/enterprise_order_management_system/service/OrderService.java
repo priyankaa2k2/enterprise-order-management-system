@@ -20,7 +20,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
-    private final UserRepository userRepository; // Ensure this repository interface exists
+    private final UserRepository userRepository;
 
     public OrderService(OrderRepository orderRepository, ProductRepository productRepository, UserRepository userRepository) {
         this.orderRepository = orderRepository;

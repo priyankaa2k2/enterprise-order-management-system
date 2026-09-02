@@ -2,13 +2,31 @@ package com.priyankaa.enterprise_order_management_system.dto;
 
 import com.priyankaa.enterprise_order_management_system.enums.Role;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class UserRequest {
 
+    @NotBlank(message = "Address is required")
     private String address;
+
+    @NotBlank(message = "Name is required")
     private String name;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
     private String email;
+
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must contain at least 8 characters")
     private String password;
+
+    @NotBlank(message = "Phone number is required")
     private String phone;
+
+    @NotNull(message = "Role is required")
     private Role role;
 
     public UserRequest() {
