@@ -1,137 +1,200 @@
 # Enterprise Order Management System (OMS)
 
-A Java/Spring Boot backend application for managing users, products, inventory, and customer orders, with authentication, authorization, transactional business logic, and database persistence
+A production-oriented Java backend application for managing users, products, inventory, and customer orders with secure authentication, role-based authorization, transactional order processing, automated testing, and Docker-based deployment.
 
-## 🚀 Technology Stack
-* **Runtime / Engine:** Java 17, Spring Boot 4.0.7
-* **Data Layer:** Spring Data JPA, Hibernate ORM, MySQL
-* **Security Layer:** Spring Security (Stateless Authorization Filter), JWT (JJWT 0.12.6), BCrypt
-* **Tools / Validation:** Jakarta Validation, Maven, Docker
+## 🚀 Tech Stack
 
-## 🛠️ System Architecture & Code Flow
-The system processes data linearly using industry-standard decoupled architecture design:
-`Client Request` ➔ `Security/JWT Filter` ➔ `REST Controller` ➔ `Service Layer (Business Logic)` ➔ `Data Access Layer (JPA Repository)` ➔ `MySQL Database`
+- **Backend:** Java 17, Spring Boot 4.0.7
+- **Security:** Spring Security, JWT, BCrypt
+- **Database:** MySQL, Spring Data JPA, Hibernate
+- **API:** REST APIs, Swagger / OpenAPI
+- **Testing:** JUnit 5, Mockito, MockMvc, H2, Postman
+- **Build:** Maven
+- **DevOps:** Docker, Docker Compose
+- **Version Control:** Git, GitHub
 
-Supporting components include:
+## ✨ Key Features
 
-* DTOs for API request/response models
-* Entity classes for persistence
-* Security configuration and JWT authentication
-* Global exception handling
-* Validation
-* Transaction management
+### User & Security
+- User registration and login
+- BCrypt password hashing
+- JWT-based stateless authentication
+- `ADMIN` and `CUSTOMER` role-based authorization
+- Protected REST endpoints
+- Authenticated user profile
 
-## 🔐 Security
+### Product & Inventory
+- Create products with unique SKU
+- Retrieve product catalog
+- Inventory availability validation
+- Automatic stock deduction during order creation
 
-The application uses **Spring Security and JWT** for authentication and authorization.
+### Order Management
+- Create orders with multiple products
+- Automatic order total calculation
+- Customer order history
+- Transactional order processing
+- Admin-controlled order status updates
+- Strict order lifecycle validation
 
-Key security concepts implemented:
+### Order Lifecycle
 
-* User authentication
-* Password protection
-* JWT generation and validation
-* Role-based access control
-* Protected API endpoints
-
-## 🔒 Security Matrix & Endpoints
-
-| HTTP Method | API Endpoint | Role Authorization | Purpose |
-| :--- | :--- | :--- | :--- |
-| **POST** | `/api/users/register` | Public (`PermitAll`) | Creates a new user profile with BCrypt hashing |
-| **POST** | `/api/users/login` | Public (`PermitAll`) | Verifies password & issues a secure stateless JWT |
-| **POST** | `/api/products` | `ADMIN` Only | Ingests a new enterprise product with a unique SKU |
-| **GET** | `/api/products` | `ADMIN`, `CUSTOMER` | Fetches full dynamic product catalog availability |
-| **POST** | `/api/orders` | `CUSTOMER` Only | Executes standard transactional checkout & stock deduction |
-| **GET** | `/api/orders` | `CUSTOMER` Only | Pulls historical user-authenticated purchase context |
-
-## 📦 Order Processing
-
-Order processing demonstrates transactional business logic.
-
-The order workflow includes:
-
-1. Validate the request
-2. Verify product availability
-3. Check inventory
-4. Create the order
-5. Deduct inventory
-6. Persist the transaction
-
-Transactional boundaries help ensure that related database operations are completed consistently.
-
-## 🗄️ Database
-
-The application uses **MySQL** with JPA/Hibernate for persistence.
-
-Main domain areas include:
-
-* Users
-* Roles
-* Products
-* Inventory
-* Orders
-* Order items
-
-Entity relationships are managed using JPA/Hibernate mappings.
-
-## 📚 API Documentation
-
-API endpoints are documented using **Swagger / OpenAPI**.
-
-After starting the application, the API documentation can be accessed through the configured Swagger UI endpoint.
-
-## ▶️ Running Locally
-
-### Prerequisites
-
-* Java 17
-* Maven
-* MySQL
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/priyankaa2k2/enterprise-order-management-system.git
-cd enterprise-order-management-system
+```text
+PENDING → CONFIRMED → SHIPPED → DELIVERED
+    ↓          ↓
+CANCELLED   CANCELLED
 ```
 
-### 2. Configure the database
+Invalid status transitions are rejected through business-rule validation.
 
-Create a MySQL database and configure the required connection properties in the application configuration.
+## 🏗️ Architecture
 
-### 3. Build the application
+The application follows a layered backend architecture:
 
-```bash
-./mvnw clean install
+```text
+Client
+  ↓
+Spring Security / JWT Filter
+  ↓
+REST Controller
+  ↓
+DTO & Validation
+  ↓
+Service / Business Logic
+  ↓
+Spring Data JPA Repository
+  ↓
+Hibernate
+  ↓
+MySQL
 ```
 
-### 4. Run the application
+Global exception handling provides consistent API error responses for validation failures, missing resources, duplicate resources, insufficient stock, invalid credentials, and invalid order status transitions.
 
-```bash
-./mvnw spring-boot:run
-```
+## 🔗 Main API Endpoints
 
-The application will start using the configured Spring Boot port.
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| POST | `/api/users/register` | Public | Register user |
+| POST | `/api/users/login` | Public | Login and receive JWT |
+| GET | `/api/users/profile` | Authenticated | Get user profile |
+| POST | `/api/products` | ADMIN | Create product |
+| GET | `/api/products` | ADMIN / CUSTOMER | View products |
+| POST | `/api/orders` | CUSTOMER | Create order |
+| GET | `/api/orders` | CUSTOMER / ADMIN | View order history |
+| PATCH | `/api/orders/{id}/status` | ADMIN | Update order status |
 
 ## 🧪 Testing
 
-The REST APIs are currently being tested using Postman.
+The project includes automated tests covering:
 
-A dedicated Postman workspace is maintained with saved requests covering authentication, product management, and order workflows.
+- Service-layer business logic
+- Controllers using MockMvc
+- Authentication and authorization
+- JWT-protected endpoints
+- Product and order workflows
+- Inventory validation
+- Order lifecycle rules
+- Exception scenarios
 
-## 📚 Project Purpose
+**Current test result:**
 
-This project was built to demonstrate practical backend development using the **Java and Spring Boot ecosystem**, including REST API development, security, persistence, database design, validation, and transactional business logic.
+```text
+Tests run: 44
+Failures: 0
+Errors: 0
+Skipped: 0
+
+BUILD SUCCESS
+```
+
+Postman API tests are also maintained in the `postman/` directory.
+
+## 📚 Swagger / OpenAPI
+
+Interactive API documentation is available after starting the application:
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+JWT-protected APIs can be tested directly through Swagger using the authorization option.
+
+## 🐳 Run with Docker
+
+### Prerequisites
+
+- Docker Desktop
+- Docker Compose
+
+Create a `.env` file using the provided `.env.example`.
+
+Then start the complete application:
+
+```bash
+docker compose up --build
+```
+
+Docker Compose starts:
+
+- Spring Boot OMS application
+- MySQL database
+- Persistent MySQL volume
+- Container networking
+- Database health check
+
+Application:
+
+```text
+http://localhost:8080
+```
+
+Swagger:
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+Stop the application:
+
+```bash
+docker compose down
+```
+
+## 🔐 Environment Configuration
+
+Sensitive configuration is supplied through environment variables instead of being committed to Git.
+
+Example:
+
+```env
+DB_USERNAME=root
+DB_PASSWORD=your_password
+JWT_SECRET=your_secure_jwt_secret
+JWT_EXPIRATION=3600000
+```
+
+The actual `.env` file is excluded through `.gitignore`.
+
+## 📂 Project Structure
+
+```text
+src/main/java/.../
+├── config
+├── controller
+├── dto
+├── entity
+├── enums
+├── exception
+├── repository
+├── security
+└── service
+```
 
 ## 📌 Project Status
 
-The core backend functionality is implemented and currently being validated through API testing.
+Core backend development is complete and includes:
 
-Future improvements may include:
+**REST APIs • JWT Security • Role-Based Authorization • MySQL Persistence • Order Lifecycle Rules • Global Exception Handling • Swagger Documentation • Automated Testing • Docker & Docker Compose**
 
-* Unit and integration testing with JUnit/Mockito
-* Docker-based application setup
-* Additional API functionality
-* Expanded automated test coverage
-
-These will be added to the project as they are implemented and validated.
+The project is built as a practical demonstration of production-oriented Java backend development using the Spring Boot ecosystem.
